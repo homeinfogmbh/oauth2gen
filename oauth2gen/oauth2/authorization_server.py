@@ -4,6 +4,7 @@ from functools import partial
 from typing import Any, Iterable, Optional, Type
 
 from authlib.integrations import flask_oauth2
+from authlib.oauth2.rfc6749 import TokenEndpoint
 from authlib.oauth2.rfc6749.grants import BaseGrant
 from flask import Flask, Response
 from peewee import Model
@@ -22,13 +23,15 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
             client: Type[Model],
             token: Type[Model],
             grants: Iterable[BaseGrant],
+            endpoints: Iterable[TokenEndpoint],
             **kwargs
     ):
         """Sets the token an user models."""
         super().__init_subclass__(**kwargs)
         cls.CLIENT_MODEL = client
         cls.TOKEN_MODEL = token
-        cls.GRANT_TYPES = grants
+        cls.GRANT_TYPES = list(grants)
+        cls.ENDPOINTS = list(endpoints)
 
     def __init__(self, application: Flask):
         super().__init__(
@@ -39,6 +42,9 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
 
         for grant in self.GRANT_TYPES:
             self.register_grant(grant)
+
+        for endpoint in self.ENDPOINTS:
+            self.register_endpoint(endpoint)
 
     def create_authorization_response(self, *args, **kwargs) -> Response:
         """Enhanced authorization response generation."""

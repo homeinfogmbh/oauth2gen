@@ -3,6 +3,7 @@
 from typing import Iterable, Iterator, Type
 
 from authlib.oauth2.rfc6749.grants import BaseGrant, ImplicitGrant
+from flask import Response
 
 from oauth2gen.oauth2.authorization_code_grant import AuthorizationCodeGrant
 from oauth2gen.oauth2.authorization_server import AuthorizationServer
@@ -26,26 +27,48 @@ def create_authorization_server(
 ) -> Type[AuthorizationServer]:
     """Creates the authorization server."""
 
+    class _TokenRevocationEndpoint(
+        TokenRevocationEndpoint,
+        token=models.token,
+        auth_methods=auth_methods
+    ):
+        pass
+
+    class _TokenIntrospectionEndpoint(
+        TokenIntrospectionEndpoint,
+        token=models.token,
+        url=url,
+        auth_methods=auth_methods
+    ):
+        pass
+
     class _AuthorizationServer(
         AuthorizationServer,
         client=models.client,
         token=models.token,
         grants=get_grants(
             models,
-            url,
             auth_methods=auth_methods,
             implicit_grant=implicit_grant,
             include_new_refresh_token=include_new_refresh_token
-        )
+        ),
+        endpoints=[_TokenRevocationEndpoint, _TokenIntrospectionEndpoint]
     ):
-        pass
+        def revoke_token(self) -> Response:
+            """Revokes a token."""
+            return self.create_endpoint_response(
+                _TokenRevocationEndpoint.ENDPOINT_NAME)
+
+        def introspect_token(self) -> Response:
+            """Introspects a token."""
+            return self.create_endpoint_response(
+                _TokenIntrospectionEndpoint.ENDPOINT_NAME)
 
     return _AuthorizationServer
 
 
 def get_grants(
         models: OAuth2Models,
-        url: str,
         *,
         auth_methods: Iterable[str] = ('client_secret_post',),
         implicit_grant: bool = True,
@@ -75,22 +98,3 @@ def get_grants(
         pass
 
     yield _RefreshTokenGrant
-
-    class _TokenRevocationEndpoint(
-        TokenRevocationEndpoint,
-        token=models.token,
-        auth_methods=auth_methods
-    ):
-        pass
-
-    yield _TokenRevocationEndpoint
-
-    class _TokenIntrospectionEndpoint(
-        TokenIntrospectionEndpoint,
-        token=models.token,
-        url=url,
-        auth_methods=auth_methods
-    ):
-        pass
-
-    yield _TokenIntrospectionEndpoint

@@ -42,6 +42,6 @@ def create_framework(
     )
     resource_protector = ResourceProtector()
     resource_protector.register_token_validator(
-        BearerTokenValidator(models.user)
+        BearerTokenValidator(models.token)
     )
     return OAuth2Framework(models, authorization_server, resource_protector)

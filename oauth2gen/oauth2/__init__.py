@@ -1,4 +1,4 @@
-"""OAuth2 authorization server."""
+"""OAuth2 authorization server generation."""
 
 from typing import Iterable, Iterator, Type
 

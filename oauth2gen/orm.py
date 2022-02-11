@@ -1,4 +1,4 @@
-"""ORM models based on MySQL Alchemy."""
+"""ORM model generation for OAuth2 providers."""
 
 from datetime import datetime
 from typing import Any, NamedTuple, Optional, Type

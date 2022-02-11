@@ -1,2 +1,2 @@
 # oauth2gen
-OAuth2 authentication generation framework using peewee for database models
+OAuth2 authentication framework generator using authlib, flask and peewee.

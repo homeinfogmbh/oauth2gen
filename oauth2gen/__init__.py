@@ -1,4 +1,4 @@
-"""OAuth2 authentication framework generator."""
+"""OAuth2 provider generator."""
 
 from typing import Any, Iterable, NamedTuple, Optional, Type
 

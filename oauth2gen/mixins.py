@@ -1,4 +1,4 @@
-"""ORM model mixin for OAuth 2.0 clients."""
+"""ORM model mixins for OAuth 2.0 providers."""
 
 from datetime import datetime, timedelta
 from typing import Any, Optional

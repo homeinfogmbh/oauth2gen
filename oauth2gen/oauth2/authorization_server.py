@@ -46,9 +46,13 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         for endpoint in self.ENDPOINTS:
             self.register_endpoint(endpoint)
 
-    def create_authorization_response(self, *args, **kwargs) -> Response:
+    def create_authorization_response(
+            self, request: Optional[Any] = None, grant_user: Any = None
+    ) -> Response:
         """Enhanced authorization response generation."""
-        response = super().create_authorization_response(*args, **kwargs)
+        response = super().create_authorization_response(
+            request=request, grant_user=grant_user
+        )
         response.status_code = get_int('redirect_status_code', 302)
         return response
 

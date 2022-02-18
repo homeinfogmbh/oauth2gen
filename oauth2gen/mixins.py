@@ -72,8 +72,12 @@ class OAuth2ClientMixin(ClientMixin):
         except VerifyMismatchError:
             return False
 
-    def check_token_endpoint_auth_method(self, method) -> bool:
-        return self.token_endpoint_auth_method == method
+    def check_endpoint_auth_method(self, method: str, endpoint: str) -> bool:
+        """Checks the authorization for the respective endpoint."""
+        if endpoint == 'token':
+            return self.token_endpoint_auth_method == method
+
+        return False
 
     def check_response_type(self, response_type: str) -> bool:
         """Verifies the response type."""

@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from argon2.exceptions import VerifyMismatchError
-from authlib.oauth2.rfc6749 import ClientMixin
-from authlib.oauth2.rfc6749 import TokenMixin
-from authlib.oauth2.rfc6749 import AuthorizationCodeMixin
+from authlib.oauth2.rfc6749.models import ClientMixin
+from authlib.oauth2.rfc6749.models import TokenMixin
+from authlib.oauth2.rfc6749.models import AuthorizationCodeMixin
 from authlib.oauth2.rfc6749.util import scope_to_list, list_to_scope
 
 

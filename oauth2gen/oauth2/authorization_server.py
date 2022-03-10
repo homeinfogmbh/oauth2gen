@@ -68,6 +68,12 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
             self.TOKEN_REVOCATION_ENDPOINT.ENDPOINT_NAME
         )
 
+    def introspect_token(self) -> Response:
+        """Introspects a token."""
+        return self.create_endpoint_response(
+            self.TOKEN_INTROSPECTION_ENDPOINT.ENDPOINT_NAME
+        )
+
 
 def query_client(
         client: Type[Model], client_id: str

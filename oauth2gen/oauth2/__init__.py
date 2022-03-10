@@ -55,15 +55,7 @@ def create_authorization_server(
         token_introspection_endpoint=_TokenIntrospectionEndpoint,
         token_revocation_endpoint=_TokenRevocationEndpoint
     ):
-        def revoke_token(self) -> Response:
-            """Revokes a token."""
-            return self.create_endpoint_response(
-                _TokenRevocationEndpoint.ENDPOINT_NAME)
-
-        def introspect_token(self) -> Response:
-            """Introspects a token."""
-            return self.create_endpoint_response(
-                _TokenIntrospectionEndpoint.ENDPOINT_NAME)
+        pass
 
     return _AuthorizationServer
 

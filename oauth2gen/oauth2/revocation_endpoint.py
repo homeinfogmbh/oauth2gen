@@ -44,7 +44,7 @@ class TokenRevocationEndpoint(RevocationEndpoint):
 
     def revoke_token(self, token: OAuth2ClientMixin) -> None:
         """Revokes the respective token."""
-        token.revoked = True
+        #token.revoked = True
         token.save()
 
 

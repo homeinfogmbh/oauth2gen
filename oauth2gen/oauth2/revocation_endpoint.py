@@ -3,7 +3,6 @@
 from typing import Iterable, Optional, Type
 
 from authlib.oauth2.rfc7009 import RevocationEndpoint
-from flask import Request
 from peewee import Expression
 
 from oauth2gen.mixins import OAuth2ClientMixin, OAuth2TokenMixin
@@ -29,19 +28,20 @@ class TokenRevocationEndpoint(RevocationEndpoint):
     def query_token(
             self,
             token: str,
-            token_type_hint: str
+            token_type_hint: str,
+            client: OAuth2TokenMixin
     ) -> Optional[OAuth2TokenMixin]:
         """Queries a token from the database."""
         try:
             token = self.TOKEN_MODEL.get(get_token_condition(
-                self.TOKEN_MODEL, token, token_type_hint
+                self.TOKEN_MODEL, client, token, token_type_hint
             ))
         except self.TOKEN_MODEL.DoesNotExist:
             return None
 
         return token
 
-    def revoke_token(self, token: OAuth2ClientMixin, request: Request) -> None:
+    def revoke_token(self, token: OAuth2ClientMixin) -> None:
         """Revokes the respective token."""
         token.revoked = True
         token.save()
@@ -49,17 +49,19 @@ class TokenRevocationEndpoint(RevocationEndpoint):
 
 def get_token_condition(
         model: Type[OAuth2TokenMixin],
+        client: OAuth2ClientMixin,
         token: str,
         token_type_hint: str
 ) -> Expression:
 
+    condition = model.client_id == client.client_id
     condition_access_token = model.access_token == token
     condition_refresh_token = model.refresh_token == token
 
     if token_type_hint == 'access_token':
-        return condition_access_token
+        return condition & condition_access_token
 
     if token_type_hint == 'refresh_token':
-        return condition_refresh_token
+        return condition & condition_refresh_token
 
-    return condition_access_token | condition_refresh_token
+    return condition & (condition_access_token | condition_refresh_token)

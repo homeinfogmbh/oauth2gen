@@ -23,7 +23,8 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
             client: Type[Model],
             token: Type[Model],
             grants: Iterable[BaseGrant],
-            endpoints: Iterable[TokenEndpoint],
+            token_introspection_endpoint: Any,
+            token_revocation_endpoint: Any,
             **kwargs
     ):
         """Sets the token an user models."""
@@ -31,7 +32,8 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         cls.CLIENT_MODEL = client
         cls.TOKEN_MODEL = token
         cls.GRANT_TYPES = list(grants)
-        cls.ENDPOINTS = list(endpoints)
+        cls.TOKEN_INTROSPECTION_ENDPOINT = token_introspection_endpoint
+        cls.TOKEN_REVOCATION_ENDPOINT = token_revocation_endpoint
 
     def __init__(self, application: Flask):
         super().__init__(
@@ -43,8 +45,8 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         for grant in self.GRANT_TYPES:
             self.register_grant(grant)
 
-        for endpoint in self.ENDPOINTS:
-            self.register_endpoint(endpoint)
+        self.register_endpoint(self.TOKEN_INTROSPECTION_ENDPOINT)
+        self.register_endpoint(self.TOKEN_REVOCATION_ENDPOINT)
 
     def create_authorization_response(
             self, request: Optional[Any] = None, grant_user: Any = None
@@ -55,6 +57,12 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         )
         response.status_code = get_int('redirect_status_code', 302)
         return response
+
+    def revoke_token(self) -> Response:
+        """Revoke a token."""
+        return self.create_endpoint_response(
+            self.TOKEN_REVOCATION_ENDPOINT.ENDPOINT_NAME
+        )
 
 
 def query_client(

@@ -52,7 +52,8 @@ def create_authorization_server(
             implicit_grant=implicit_grant,
             include_new_refresh_token=include_new_refresh_token
         ),
-        endpoints=[_TokenRevocationEndpoint, _TokenIntrospectionEndpoint]
+        token_introspection_endpoint=_TokenIntrospectionEndpoint,
+        token_revocation_endpoint=_TokenRevocationEndpoint
     ):
         def revoke_token(self) -> Response:
             """Revokes a token."""

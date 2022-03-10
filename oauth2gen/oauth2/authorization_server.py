@@ -23,8 +23,8 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
             client: Type[Model],
             token: Type[Model],
             grants: Iterable[BaseGrant],
-            token_introspection_endpoint: Any,
-            token_revocation_endpoint: Any,
+            token_introspection_endpoint: TokenEndpoint,
+            token_revocation_endpoint: TokenEndpoint,
             **kwargs
     ):
         """Sets the token an user models."""

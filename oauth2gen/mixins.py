@@ -74,7 +74,7 @@ class OAuth2ClientMixin(ClientMixin):
 
     def check_endpoint_auth_method(self, method: str, endpoint: str) -> bool:
         """Checks the authorization for the respective endpoint."""
-        if endpoint == 'token':
+        if endpoint in {'token', 'revocation', 'refresh_token'}:
             return self.token_endpoint_auth_method == method
 
         return False

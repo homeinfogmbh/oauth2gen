@@ -29,22 +29,17 @@ class TokenRevocationEndpoint(RevocationEndpoint):
             self, token: str, token_type_hint: str, client: OAuth2TokenMixin
     ) -> Optional[OAuth2TokenMixin]:
         """Queries a token from the database."""
-        condition = get_token_condition(
-            self.TOKEN_MODEL, client, token, token_type_hint
-        )
-        print('DEBUG CONDITION:', condition, flush=True)
-
         try:
-            token = self.TOKEN_MODEL.get(condition)
+            token = self.TOKEN_MODEL.get(get_token_condition(
+                self.TOKEN_MODEL, client, token, token_type_hint
+            ))
         except self.TOKEN_MODEL.DoesNotExist:
             return None
 
-        print('DEBUG TOKEN:', token, flush=True)
         return token
 
     def revoke_token(self, token: OAuth2ClientMixin) -> None:
         """Revokes the respective token."""
-        print('DEBUG REVOKING TOKEN:', token, flush=True)
         token.revoked = True
         token.save()
 

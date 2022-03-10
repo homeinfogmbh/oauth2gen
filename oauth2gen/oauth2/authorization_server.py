@@ -60,10 +60,6 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
 
     def revoke_token(self) -> Response:
         """Revoke a token."""
-        print('DEBUG REVOKE TOKEN:',
-              self.TOKEN_REVOCATION_ENDPOINT.ENDPOINT_NAME,
-              flush=True
-        )
         return self.create_endpoint_response(
             self.TOKEN_REVOCATION_ENDPOINT.ENDPOINT_NAME
         )

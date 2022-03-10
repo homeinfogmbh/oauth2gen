@@ -1,4 +1,4 @@
-"""Toaken revication endpoint."""
+"""Token revocation endpoint."""
 
 from typing import Iterable, Optional, Type
 

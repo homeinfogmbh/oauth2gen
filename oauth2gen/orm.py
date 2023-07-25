@@ -21,7 +21,7 @@ from oauth2gen.mixins import OAuth2TokenMixin
 from oauth2gen.mixins import OAuth2AuthorizationCodeMixin
 
 
-__all__ = ['OAuth2Models', 'create_models']
+__all__ = ["OAuth2Models", "create_models"]
 
 
 class OAuth2Models(NamedTuple):
@@ -40,10 +40,10 @@ class OAuth2Models(NamedTuple):
 
 
 def create_models(
-        user_model: Type[Model],
-        config: dict[str, Any],
-        *,
-        base_model: Optional[Type[Model]] = None
+    user_model: Type[Model],
+    config: dict[str, Any],
+    *,
+    base_model: Optional[Type[Model]] = None,
 ) -> OAuth2Models:
     """Creates OAuth models for the given user model."""
 
@@ -54,14 +54,11 @@ def create_models(
         """An OAuth client."""
 
         user = ForeignKeyField(
-            user_model, column_name='user', on_delete='CASCADE',
-            lazy_load=False
+            user_model, column_name="user", on_delete="CASCADE", lazy_load=False
         )
         client_id = CharField(48, default=lambda: uuid4().hex, index=True)
         client_secret = Argon2Field(null=True)
-        client_id_issued_at = IntegerField(
-            default=lambda: datetime.now().timestamp()
-        )
+        client_id_issued_at = IntegerField(default=lambda: datetime.now().timestamp())
         client_secret_expires_at = IntegerField(default=0)
         # Meta data.
         token_endpoint_auth_method = TextField(null=True)
@@ -79,91 +76,113 @@ def create_models(
             """Adds a new client for the given user."""
             client = cls(
                 user=user,
-                token_endpoint_auth_method=config.get(
-                    'token_endpoint_auth_method'
-                )
+                token_endpoint_auth_method=config.get("token_endpoint_auth_method"),
             )
             client.client_secret = secret
             transaction = Transaction()
             transaction.add(client, primary=True)
 
-            for uri in config.get('redirect_uris', []):
+            for uri in config.get("redirect_uris", []):
                 transaction.add(RedirectURI(client=client, uri=uri))
 
-            for typ in config.get('grant_types', []):
+            for typ in config.get("grant_types", []):
                 transaction.add(GrantType(client=client, type=typ))
 
-            for typ in config.get('response_types', []):
+            for typ in config.get("response_types", []):
                 transaction.add(ResponseType(client=client, type=typ))
 
-            for scope in config.get('scopes', []):
+            for scope in config.get("scopes", []):
                 transaction.add(Scope(client=client, scope=scope))
 
-            for contact in config.get('contacts', []):
+            for contact in config.get("contacts", []):
                 transaction.add(Contact(client=client, contact=contact))
 
-            for jwk in config.get('jwks', []):
+            for jwk in config.get("jwks", []):
                 transaction.add(JWKS(client=client, jwk=jwk))
 
             return transaction
 
     class RedirectURI(base_model):
         class Meta:
-            table_name = 'redirect_uri'
+            table_name = "redirect_uri"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='redirect_uris',
-            lazy_load=False, on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="redirect_uris",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         uri = TextField()
 
     class GrantType(base_model):
         class Meta:
-            table_name = 'grant_type'
+            table_name = "grant_type"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='grant_types',
-            lazy_load=False, on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="grant_types",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         type = TextField()
 
     class ResponseType(base_model):
         class Meta:
-            table_name = 'response_type'
+            table_name = "response_type"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='response_types',
-            lazy_load=False, on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="response_types",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         type = TextField()
 
     class Scope(base_model):
         class Meta:
-            table_name = 'scope'
+            table_name = "scope"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='scopes', lazy_load=False,
-            on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="scopes",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         scope = TextField()
 
     class Contact(base_model):
         class Meta:
-            table_name = 'contact'
+            table_name = "contact"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='contacts', lazy_load=False,
-            on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="contacts",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         contact = TextField()
 
     class JWKS(base_model):
         class Meta:
-            table_name = 'jwks'
+            table_name = "jwks"
 
         client = ForeignKeyField(
-            Client, column_name='client', backref='jwks', lazy_load=False,
-            on_delete='CASCADE', on_update='CASCADE'
+            Client,
+            column_name="client",
+            backref="jwks",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         jwk = JSONTextField(serialize=json_dumps, deserialize=json_loads)
 
@@ -171,14 +190,17 @@ def create_models(
         """An OAuth bearer token."""
 
         user = ForeignKeyField(
-            user_model, column_name='user', lazy_load=False,
-            on_delete='CASCADE', on_update='CASCADE'
+            user_model,
+            column_name="user",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         client_id = CharField(48, null=True)
         token_type = CharField(40, null=True)
         access_token = CharField(255, unique=True)
         refresh_token = CharField(255, index=True, null=True)
-        scope = TextField(default='')
+        scope = TextField(default="")
         revoked = BooleanField(default=False)
         issued_at = DateTimeField(default=datetime.now)
         expires_in = IntegerField(default=0)
@@ -187,24 +209,27 @@ def create_models(
         """An OAuth authorization code."""
 
         class Meta:
-            table_name = 'authorization_code'
+            table_name = "authorization_code"
 
         user = ForeignKeyField(
-            user_model, column_name='user', lazy_load=False,
-            on_delete='CASCADE', on_update='CASCADE'
+            user_model,
+            column_name="user",
+            lazy_load=False,
+            on_delete="CASCADE",
+            on_update="CASCADE",
         )
         code = CharField(120, unique=True)
         client_id = CharField(48, null=True)
-        redirect_uri = TextField(default='')
-        response_type = TextField(default='')
-        scope = TextField(default='')
+        redirect_uri = TextField(default="")
+        response_type = TextField(default="")
+        scope = TextField(default="")
         nonce = TextField(null=True)
         auth_time = DateTimeField(default=datetime.now)
         code_challenge = TextField(null=True)
         code_challenge_method = CharField(48, null=True)
 
         def create_authorization_code(
-                self, client: Client, grant_user: user_model, request: Any
+            self, client: Client, grant_user: user_model, request: Any
         ) -> str:
             """Create authorization code with
             additional nonce for OpenID Connect.
@@ -216,7 +241,7 @@ def create_models(
                 scope=request.scope,
                 user_id=grant_user.id,
                 # OpenID request *may* have "nonce" parameter
-                nonce=request.data.get('nonce')
+                nonce=request.data.get("nonce"),
             )
             record.save()
             return code
@@ -231,5 +256,5 @@ def create_models(
         Contact,
         JWKS,
         Token,
-        AuthorizationCode
+        AuthorizationCode,
     )

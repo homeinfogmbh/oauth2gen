@@ -8,18 +8,19 @@ from peewee import Model
 from oauth2gen.mixins import OAuth2TokenMixin
 
 
-__all__ = ['RefreshTokenGrant']
+__all__ = ["RefreshTokenGrant"]
 
 
 class RefreshTokenGrant(grants.RefreshTokenGrant):
     """Handles refresh token grants."""
 
     def __init_subclass__(
-            cls, *,
-            token: Type[OAuth2TokenMixin],
-            auth_methods: Iterable[str] = ('client_secret_post',),
-            include_new_refresh_token: bool = True,
-            **kwargs
+        cls,
+        *,
+        token: Type[OAuth2TokenMixin],
+        auth_methods: Iterable[str] = ("client_secret_post",),
+        include_new_refresh_token: bool = True,
+        **kwargs
     ):
         """Sets the token model."""
         super().__init_subclass__(**kwargs)
@@ -28,7 +29,7 @@ class RefreshTokenGrant(grants.RefreshTokenGrant):
         cls.INCLUDE_NEW_REFRESH_TOKEN = include_new_refresh_token
 
     def authenticate_refresh_token(
-            self, refresh_token: str
+        self, refresh_token: str
     ) -> Optional[OAuth2TokenMixin]:
         """Authenticates the refresh token."""
         try:
@@ -43,9 +44,7 @@ class RefreshTokenGrant(grants.RefreshTokenGrant):
 
         return refresh_token
 
-    def authenticate_user(
-            self, credential: OAuth2TokenMixin
-    ) -> Optional[Model]:
+    def authenticate_user(self, credential: OAuth2TokenMixin) -> Optional[Model]:
         """Authenticates the user."""
         if credential.is_valid():
             return credential.user

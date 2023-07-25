@@ -10,11 +10,7 @@ from authlib.oauth2.rfc6749.models import AuthorizationCodeMixin
 from authlib.oauth2.rfc6749.util import scope_to_list, list_to_scope
 
 
-__all__ = [
-    'OAuth2ClientMixin',
-    'OAuth2TokenMixin',
-    'OAuth2AuthorizationCodeMixin'
-]
+__all__ = ["OAuth2ClientMixin", "OAuth2TokenMixin", "OAuth2AuthorizationCodeMixin"]
 
 
 class OAuth2ClientMixin(ClientMixin):
@@ -28,10 +24,10 @@ class OAuth2ClientMixin(ClientMixin):
         `Section 3.2.1`: https://tools.ietf.org/html/rfc7591#section-3.2.1
         """
         return {
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            'client_id_issued_at': self.client_id_issued_at,
-            'client_secret_expires_at': self.client_secret_expires_at
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "client_id_issued_at": self.client_id_issued_at,
+            "client_secret_expires_at": self.client_secret_expires_at,
         }
 
     def get_client_id(self):
@@ -50,7 +46,7 @@ class OAuth2ClientMixin(ClientMixin):
     def get_allowed_scope(self, scope: str) -> str:
         """Returns the allowed scope."""
         if not scope:
-            return ''
+            return ""
 
         allowed = {scope.scope for scope in self.scopes}
         scopes = scope_to_list(scope)

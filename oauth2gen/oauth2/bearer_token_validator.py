@@ -8,29 +8,23 @@ from peewee import Model
 from oauth2gen.mixins import OAuth2TokenMixin
 
 
-__all__ = ['BearerTokenValidator']
+__all__ = ["BearerTokenValidator"]
 
 
 class BearerTokenValidator(rfc6750.BearerTokenValidator):
     """Validates bearer tokens."""
 
     def __init__(
-            self,
-            token_model: Type[OAuth2TokenMixin],
-            realm: Optional[str] = None
+        self, token_model: Type[OAuth2TokenMixin], realm: Optional[str] = None
     ):
         """Sets the token model."""
         super().__init__(realm=realm)
         self.token_model = token_model
 
-    def authenticate_token(
-            self, token_string: str
-    ) -> Optional[OAuth2TokenMixin]:
+    def authenticate_token(self, token_string: str) -> Optional[OAuth2TokenMixin]:
         """Authenticates a token."""
         try:
-            return self.token_model.get(
-                self.token_model.access_token == token_string
-            )
+            return self.token_model.get(self.token_model.access_token == token_string)
         except self.token_model.DoesNotExist:
             return None
 

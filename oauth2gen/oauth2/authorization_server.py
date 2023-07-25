@@ -12,20 +12,21 @@ from peewee import Model
 from wsgilib import get_int
 
 
-__all__ = ['AuthorizationServer']
+__all__ = ["AuthorizationServer"]
 
 
 class AuthorizationServer(flask_oauth2.AuthorizationServer):
     """Subclass of the original flask authorization server."""
 
     def __init_subclass__(
-            cls, *,
-            client: Type[Model],
-            token: Type[Model],
-            grants: Iterable[BaseGrant],
-            token_introspection_endpoint: TokenEndpoint,
-            token_revocation_endpoint: TokenEndpoint,
-            **kwargs
+        cls,
+        *,
+        client: Type[Model],
+        token: Type[Model],
+        grants: Iterable[BaseGrant],
+        token_introspection_endpoint: TokenEndpoint,
+        token_revocation_endpoint: TokenEndpoint,
+        **kwargs
     ):
         """Sets the token an user models."""
         super().__init_subclass__(**kwargs)
@@ -39,7 +40,7 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         super().__init__(
             application,
             query_client=partial(query_client, self.CLIENT_MODEL),
-            save_token=partial(save_token, self.TOKEN_MODEL)
+            save_token=partial(save_token, self.TOKEN_MODEL),
         )
 
         for grant in self.GRANT_TYPES:
@@ -49,13 +50,13 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         self.register_endpoint(self.TOKEN_REVOCATION_ENDPOINT)
 
     def create_authorization_response(
-            self, request: Optional[Any] = None, grant_user: Any = None
+        self, request: Optional[Any] = None, grant_user: Any = None
     ) -> Response:
         """Enhanced authorization response generation."""
         response = super().create_authorization_response(
             request=request, grant_user=grant_user
         )
-        response.status_code = get_int('redirect_status_code', 302)
+        response.status_code = get_int("redirect_status_code", 302)
         return response
 
     def revoke_token(self) -> Response:
@@ -71,9 +72,7 @@ class AuthorizationServer(flask_oauth2.AuthorizationServer):
         )
 
 
-def query_client(
-        client: Type[Model], client_id: str
-) -> Optional[Model]:
+def query_client(client: Type[Model], client_id: str) -> Optional[Model]:
     """Returns a client by its ID."""
 
     try:
@@ -82,9 +81,7 @@ def query_client(
         return None
 
 
-def save_token(
-        token: Type[Model], token_data: dict, request: Any
-) -> None:
+def save_token(token: Type[Model], token_data: dict, request: Any) -> None:
     """Stores the respective token."""
 
     if request.user:
@@ -92,6 +89,4 @@ def save_token(
     else:
         user_id = request.client.user_id
 
-    token(
-        client_id=request.client.client_id, user_id=user_id, **token_data
-    ).save()
+    token(client_id=request.client.client_id, user_id=user_id, **token_data).save()

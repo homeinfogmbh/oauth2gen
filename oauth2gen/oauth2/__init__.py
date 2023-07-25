@@ -14,23 +14,21 @@ from oauth2gen.oauth2.revocation_endpoint import TokenRevocationEndpoint
 from oauth2gen.orm import OAuth2Models
 
 
-__all__ = ['BearerTokenValidator', 'create_authorization_server']
+__all__ = ["BearerTokenValidator", "create_authorization_server"]
 
 
 def create_authorization_server(
-        models: OAuth2Models,
-        url: str,
-        *,
-        auth_methods: Iterable[str] = ('client_secret_post',),
-        implicit_grant: bool = True,
-        include_new_refresh_token: bool = True
+    models: OAuth2Models,
+    url: str,
+    *,
+    auth_methods: Iterable[str] = ("client_secret_post",),
+    implicit_grant: bool = True,
+    include_new_refresh_token: bool = True
 ) -> Type[AuthorizationServer]:
     """Creates the authorization server."""
 
     class _TokenRevocationEndpoint(
-        TokenRevocationEndpoint,
-        token=models.token,
-        auth_methods=auth_methods
+        TokenRevocationEndpoint, token=models.token, auth_methods=auth_methods
     ):
         pass
 
@@ -38,7 +36,7 @@ def create_authorization_server(
         TokenIntrospectionEndpoint,
         token=models.token,
         url=url,
-        auth_methods=auth_methods
+        auth_methods=auth_methods,
     ):
         pass
 
@@ -50,10 +48,10 @@ def create_authorization_server(
             models,
             auth_methods=auth_methods,
             implicit_grant=implicit_grant,
-            include_new_refresh_token=include_new_refresh_token
+            include_new_refresh_token=include_new_refresh_token,
         ),
         token_introspection_endpoint=_TokenIntrospectionEndpoint,
-        token_revocation_endpoint=_TokenRevocationEndpoint
+        token_revocation_endpoint=_TokenRevocationEndpoint,
     ):
         pass
 
@@ -61,11 +59,11 @@ def create_authorization_server(
 
 
 def get_grants(
-        models: OAuth2Models,
-        *,
-        auth_methods: Iterable[str] = ('client_secret_post',),
-        implicit_grant: bool = True,
-        include_new_refresh_token: bool = True
+    models: OAuth2Models,
+    *,
+    auth_methods: Iterable[str] = ("client_secret_post",),
+    implicit_grant: bool = True,
+    include_new_refresh_token: bool = True
 ) -> Iterator[BaseGrant]:
     """Yields the default grants."""
 
@@ -76,7 +74,7 @@ def get_grants(
         AuthorizationCodeGrant,
         authorization_code=models.authorization_code,
         user=models.user,
-        auth_methods=auth_methods
+        auth_methods=auth_methods,
     ):
         pass
 
@@ -86,7 +84,7 @@ def get_grants(
         RefreshTokenGrant,
         token=models.token,
         auth_methods=auth_methods,
-        include_new_refresh_token=include_new_refresh_token
+        include_new_refresh_token=include_new_refresh_token,
     ):
         pass
 

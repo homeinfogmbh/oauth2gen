@@ -8,18 +8,19 @@ from peewee import Model
 from oauth2gen.mixins import OAuth2ClientMixin
 
 
-__all__ = ['AuthorizationCodeGrant']
+__all__ = ["AuthorizationCodeGrant"]
 
 
 class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
     """Handles authorization code grants."""
 
     def __init_subclass__(
-            cls, *,
-            authorization_code: Type[Model],
-            user: Type[Model],
-            auth_methods: Iterable[str] = ('client_secret_post',),
-            **kwargs
+        cls,
+        *,
+        authorization_code: Type[Model],
+        user: Type[Model],
+        auth_methods: Iterable[str] = ("client_secret_post",),
+        **kwargs
     ):
         """Sets the respective models."""
         super().__init_subclass__(**kwargs)
@@ -34,29 +35,29 @@ class AuthorizationCodeGrant(grants.AuthorizationCodeGrant):
             client_id=request.client.client_id,
             redirect_uri=request.redirect_uri,
             scope=request.scope,
-            user_id=request.user.id
+            user_id=request.user.id,
         ).save()
 
     def query_authorization_code(
-            self, code: str, client: OAuth2ClientMixin
+        self, code: str, client: OAuth2ClientMixin
     ) -> Optional[Type[Model]]:
         """Returns the authorization code."""
         try:
-            return self.AUTHORIZATION_CODE_MODEL.select(
-                self.AUTHORIZATION_CODE_MODEL,
-                self.USER_MODEL
-            ).join(
-                self.USER_MODEL
-            ).where(
-                (self.AUTHORIZATION_CODE_MODEL.code == code)
-                & (self.AUTHORIZATION_CODE_MODEL.client_id == client.client_id)
-            ).get()
+            return (
+                self.AUTHORIZATION_CODE_MODEL.select(
+                    self.AUTHORIZATION_CODE_MODEL, self.USER_MODEL
+                )
+                .join(self.USER_MODEL)
+                .where(
+                    (self.AUTHORIZATION_CODE_MODEL.code == code)
+                    & (self.AUTHORIZATION_CODE_MODEL.client_id == client.client_id)
+                )
+                .get()
+            )
         except self.AUTHORIZATION_CODE_MODEL.DoesNotExist:
             return None
 
-    def delete_authorization_code(
-            self, authorization_code: Model
-    ) -> None:
+    def delete_authorization_code(self, authorization_code: Model) -> None:
         """Deletes the respective authorization code."""
         authorization_code.delete_instance()
 
